@@ -33,5 +33,6 @@ def products(request):
 def customer(request, pk_test):
     customers = Customer.objects.get(id=pk_test)
     orders = customers.order_set.all()
-    context = {'customer':customers, 'orders':orders}
-    return render(request, 'account/customer.html')
+    order_count = orders.count()
+    context = {'customer':customers, 'orders': orders, 'order_count':order_count}
+    return render(request, 'account/customer.html',context)
