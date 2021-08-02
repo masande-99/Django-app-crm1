@@ -3,15 +3,21 @@ from django.http import HttpResponse
 
 
 # Create your views here.
-from .models import *
+from accounts.models import *
 
 
 def home(request):
-    return render(request, 'account/dashboard.html')
+    orders = Order.objects.all()
+    print(orders)
+    customers = Customer.objects.all()
+
+    context = {'orders': orders, 'customers': customers}
+
+    return render(request, 'account/dashboard.html', context)
 
 
 def products(request):
-    product = models.Product.objects.all()
+    product = Product.objects.all()
     print(product)
 
     return render(request, 'account/products.html', {'Products': product})
