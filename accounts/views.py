@@ -8,20 +8,30 @@ from accounts.models import *
 
 def home(request):
     orders = Order.objects.all()
-    print(orders)
     customers = Customer.objects.all()
 
-    context = {'orders': orders, 'customers': customers}
+    total_customers = customers.count()
+    total_orders = orders.count()
+
+    delivered = orders.filter(status="Delivered").count()
+    pending = orders.filter(status="Pending").count()
+
+    context = {'orders': orders, 'customers': customers,
+               'total_customers': total_customers,
+               'total_orders': total_orders, 'delivered': delivered,
+               'pending': pending}
 
     return render(request, 'account/dashboard.html', context)
 
 
 def products(request):
     product = Product.objects.all()
-    print(product)
 
     return render(request, 'account/products.html', {'Products': product})
 
 
-def customer(request):
+def customer(request, pk_test):
+    customers = Customer.objects.get(id=pk_test)
+    orders = customers.order_set.all()
+    context = {'customer':customers, 'orders':orders}
     return render(request, 'account/customer.html')
