@@ -15,11 +15,13 @@
             <a class="btn btn-primary btn-ms btn-block" href="">Create customer</a>
             <table class="table table-sm">
                 <tr>
+                    <th></th>
                     <th>Customer</th>
                     <th>Phone</th>
                 </tr>
                 {% for customer in customers %}
                     <tr>
+                        <td><a class="btn btn-sm btn-info" href="{% url 'customer' customer.id %}">View</a> </td>
                         <td>{{customer.name}}</td>
                         <td>{{customer.phone}}</td>
                     </tr>
@@ -32,9 +34,10 @@
         <h5>Last five orders</h5>
         <hr>
         <div class="card card-body">
-            <a class="btn btn-primary" href="">Create order</a>
+            <a class="btn btn-primary" href="{% url 'create_order' %}">Create order</a>
             <table class="table table-sm">
                 <tr>
+
                     <th>Product</th>
                     <th>Date ordered</th>
                     <th>Status</th>
@@ -46,8 +49,8 @@
                         <td>{{i.products}}</td>
                         <td>{{i.date_created}}</td>
                         <td>{{i.status}}</td>
-                        <td><a class="btn btn-sm btn-danger" href="" />Delete</td>
-                        <td><a class="btn btn-sm btn-info" href="" />Update</td>
+                        <td><a class="btn btn-sm btn-danger" href="{% url 'delete_order' i.id %}" >Delete</a></td>
+                        <td><a class="btn btn-sm btn-info" href="{% url 'update_order' i.id %}" />Update</td>
                     </tr>
                 {% endfor %}
             </table>
