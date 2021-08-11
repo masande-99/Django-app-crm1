@@ -8,6 +8,8 @@ from accounts.models import *
 
 from .forms import OrderForm
 
+from .filters import OrderFilter
+
 
 def home(request):
     orders = Order.objects.all()
@@ -39,22 +41,27 @@ def customer(request, pk_test):
 
     order_count = orders.count()
 
-    context = {'customer':customers, 'orders': orders, 'order_count':order_count}
+    myFilter = OrderFilter(request.GET, queryset=orders)
+    orders = myFilter.qs
+
+    context = {'customer':customers, 'orders': orders, 'order_count':order_count, 'myFilter':myFilter}
     return render(request, 'account/customer.html',context)
 
 
 def createOrder(request, pk):
-
+    OrderFormSet = inlineformset_factory(Customer, Order, fields=('products', 'status'), extra=10)
     customer = Customer.objects.get(id=pk)
-    form = OrderForm(initial={'customer': customer})
+    formset = OrderFormSet(queryset=Order.objects.none(), instance=customer)
+    # form = OrderForm(initial={'customer': customer})
 
     if request.method == 'POST':
-        form = OrderForm(request.POST)
-        if form.is_valid():
-            form.save()
+        # form = OrderForm(request.POST)
+        formset = OrderFormSet(request.POST, instance=customer)
+        if formset.is_valid():
+            formset.save()
             return redirect('/')
 
-    context = {'form': form}
+    context = {'formset': formset}
 
     return render(request, 'account/order_form.html', context)
 
