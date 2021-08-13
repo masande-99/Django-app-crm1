@@ -10,53 +10,55 @@ from django.contrib.auth.decorators import login_required
 from accounts.models import *
 from .forms import OrderForm, CreateUserForm
 from .filters import OrderFilter
+from accounts.decorators import unauthenticated_user, allowed_users
 
 
+@unauthenticated_user
 def registerPage(request):
-    if request.user.is_authenticated:
-        return redirect('home')
-    else:
-        form = CreateUserForm()
+    form = CreateUserForm()
 
-        if request.method == 'POST':
-            form = CreateUserForm(request.POST)
-            if form.is_valid():
-                form.save()
-                user = form.cleaned_data.get('username')
-                messages.success(request, 'Account was created for user '+ user)
-                return redirect('login')
+    if request.method == 'POST':
+        form = CreateUserForm(request.POST)
+        if form.is_valid():
+            form.save()
+            user = form.cleaned_data.get('username')
+            messages.success(request, 'Account was created for user '+ user)
+            return redirect('login')
 
-        context = {'form':form}
-        return render(request, 'account/register.html', context)
+    context = {'form':form}
+    return render(request, 'account/register.html', context)
 
 
 def loginPage(request):
-    if request.user.is_authenticated:
-        return redirect('home')
-    else:
-        if request.method == 'POST':
-            username = request.POST.get('username')
-            password = request.POST.get('password')
+    if request.method == 'POST':
+        username = request.POST.get('username')
+        password = request.POST.get('password')
 
-            user = authenticate(request, username=username, password=password)
+        user = authenticate(request, username=username, password=password)
 
-            if user is not None:
-                login(request, user)
-                return redirect('home')
-            else:
-                messages.info(request, 'Username or password does not exist')
+        if user is not None:
+            login(request, user)
+            return redirect('home')
+        else:
+            messages.info(request, 'Username or password does not exist')
 
-        context = {}
-        return render(request, 'account/login.html', context)
+    context = {}
+    return render(request, 'account/login.html', context)
 
 
-@login_required(login_url='login')
 def logoutUser(request):
     logout(request)
     return redirect('login')
 
 
 @login_required(login_url='login')
+def userPage(request):
+    context = {}
+    return render(request, 'account/user.html', context)
+
+
+@login_required(login_url='login')
+@allowed_users(allowed_roles=['admin'])
 def home(request):
     orders = Order.objects.all()
     customers = Customer.objects.all()
@@ -76,6 +78,7 @@ def home(request):
 
 
 @login_required(login_url='login')
+@allowed_users(allowed_roles=['admin'])
 def products(request):
     product = Product.objects.all()
 
@@ -83,6 +86,7 @@ def products(request):
 
 
 @login_required(login_url='login')
+@allowed_users(allowed_roles=['admin'])
 def customer(request, pk_test):
     customers = Customer.objects.get(id=pk_test)
     orders = customers.order_set.all()
@@ -97,6 +101,7 @@ def customer(request, pk_test):
 
 
 @login_required(login_url='login')
+@allowed_users(allowed_roles=['admin'])
 def createOrder(request, pk):
     OrderFormSet = inlineformset_factory(Customer, Order, fields=('products', 'status'), extra=10)
     customer = Customer.objects.get(id=pk)
@@ -116,6 +121,7 @@ def createOrder(request, pk):
 
 
 @login_required(login_url='login')
+@allowed_users(allowed_roles=['admin'])
 def updateOrder(request, pk):
     order = Order.objects.get(id=pk)
     form = OrderForm(instance=order)
@@ -130,12 +136,13 @@ def updateOrder(request, pk):
 
 
 @login_required(login_url='login')
+@allowed_users(allowed_roles=['admin'])
 def deleteOrder(request, pk):
     order = Order.objects.get(id=pk)
     if request.method == "POST":
         order.delete()
         return redirect('/')
 
-    context = {'item':order}
+    context = {'item': order}
 
     return render(request, 'account/delete.html', context)
