@@ -81,10 +81,10 @@ def accountSettings(request):
 
     if request.method == 'POST':
         form = CreateUserForm(request.POST, request.FILES, instance=customer)
-        if form.is_valid:
+        if form.is_valid():
             form.save()
 
-    context = {'form':form}
+    context = {'form': form}
     return render(request, 'account/account_settings.html', context)
 
 
