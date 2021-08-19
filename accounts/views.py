@@ -16,20 +16,17 @@ from accounts.decorators import unauthenticated_user, allowed_users, admin_only
 
 def registerPage(request):
     form = CreateUserForm()
-
     if request.method == 'POST':
         form = CreateUserForm(request.POST)
         if form.is_valid():
             user = form.save()
             username = form.cleaned_data.get('username')
 
+            messages.success(request, 'Account was created for ' + username)
 
-
-
-            messages.success(request, 'Account was created for user '+ username)
             return redirect('login')
 
-    context = {'form':form}
+    context = {'form': form}
     return render(request, 'account/register.html', context)
 
 
@@ -65,7 +62,7 @@ def userPage(request):
     delivered = orders.filter(status="Delivered").count()
     pending = orders.filter(status="Pending").count()
 
-    context = {'orders':orders,  'total_orders': total_orders, 'delivered': delivered,
+    context = {'orders': orders, 'total_orders': total_orders, 'delivered': delivered,
                'pending': pending}
     return render(request, 'account/user.html', context)
 
@@ -124,8 +121,8 @@ def customer(request, pk_test):
     myFilter = OrderFilter(request.GET, queryset=orders)
     orders = myFilter.qs
 
-    context = {'customer':customers, 'orders': orders, 'order_count':order_count, 'myFilter':myFilter}
-    return render(request, 'account/customer.html',context)
+    context = {'customer': customers, 'orders': orders, 'order_count': order_count, 'myFilter': myFilter}
+    return render(request, 'account/customer.html', context)
 
 
 @login_required(login_url='login')

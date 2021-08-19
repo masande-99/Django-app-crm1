@@ -4,13 +4,15 @@ from .models import Customer
 from django.contrib.auth.models import Group
 
 
-def customer_profile(sender, instance, create, **kwargs):
-    if created :
+def customer_profile(sender, instance, created, **kwargs):
+    if created:
         group = Group.objects.get(name='customers')
-        instance.user.groups.add(group)
+        instance.groups.add(group)
         Customer.objects.create(
-                user=instance.user,
-                name=instance.name
+                user=instance,
+                name=instance.username
             )
+        print('Account created')
+
 
 post_save.connect(customer_profile, sender=User)
