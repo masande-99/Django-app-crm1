@@ -137,3 +137,13 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'static/images')
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 os.environ['DJANGO_SETTINGS_MODULE'] = 'crm1.settings'
+
+
+# SMTP configuration
+
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = 'gontyelenimasande@gmail.com'
+EMAIL_HOST_PASSWORD = 'Sandei99#'
